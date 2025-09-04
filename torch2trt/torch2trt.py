@@ -536,6 +536,7 @@ def torch2trt(module,
               max_shapes=None,
               opt_shapes=None,
               onnx_opset=None,
+              dynamo=False,
               max_batch_size=None,
               avg_timing_iterations=None,
               **kwargs):
@@ -615,7 +616,8 @@ def torch2trt(module,
                 name: {int(axis): f'input_{index}_axis_{axis}' for axis in dynamic_axes_flat[index]}
                 for index, name in enumerate(input_names)
             },
-            opset_version=onnx_opset
+            opset_version=onnx_opset,
+            dynamo=dynamo,
         )
         f.seek(0)
         
