@@ -539,6 +539,7 @@ def torch2trt(module,
               dynamo=False,
               max_batch_size=None,
               avg_timing_iterations=None,
+              logger=None,
               **kwargs):
 
     # capture arguments to provide to context
@@ -589,7 +590,8 @@ def torch2trt(module,
             if len(value) > 0:
                 raise ValueError('Dataset cannot have multiple shapes when using DLA')
 
-    logger = trt.Logger(log_level)
+    if logger is None:
+        logger = trt.Logger(log_level)
     builder = trt.Builder(logger)
     config = builder.create_builder_config()
 
