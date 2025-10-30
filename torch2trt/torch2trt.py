@@ -705,7 +705,7 @@ def torch2trt(module,
     else:
         engine = builder.build_serialized_network(network, config)
 
-    module_trt = TRTModule(engine, input_names, output_names, input_flattener=input_flattener, output_flattener=output_flattener, lolgger=logger)
+    module_trt = TRTModule(engine, input_names, output_names, input_flattener=input_flattener, output_flattener=output_flattener, logger=logger)
 
     if keep_network:
         module_trt.network = network
