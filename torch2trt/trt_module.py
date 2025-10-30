@@ -11,18 +11,21 @@ from .version_utils import (
 
 
 class TRTModule(torch.nn.Module):
-    def __init__(self, engine=None, input_names=None, output_names=None, input_flattener=None, output_flattener=None):
+    def __init__(self, engine=None, input_names=None, output_names=None, input_flattener=None, output_flattener=None, logger=None):
         super(TRTModule, self).__init__()
         self._register_state_dict_hook(TRTModule._on_state_dict)
+        self.logger = logger
+        if self.logger is None:
+            self.logger = trt.Logger()
 
         if isinstance(engine, str):
             # assume filepath
             with open(engine, 'rb') as f:
                 engine = f.read()
-            with trt.Logger() as logger, trt.Runtime(logger) as runtime:
+            with trt.Runtime(self.logger) as runtime:
                 engine = runtime.deserialize_cuda_engine(engine)
         elif isinstance(engine, trt.IHostMemory):
-            with trt.Logger() as logger, trt.Runtime(logger) as runtime:
+            with trt.Runtime(self.logger) as runtime:
                 engine = runtime.deserialize_cuda_engine(engine)
             
         self.engine = engine
@@ -75,7 +78,7 @@ class TRTModule(torch.nn.Module):
     ):
         engine_bytes = state_dict[prefix + "engine"]
 
-        with trt.Logger() as logger, trt.Runtime(logger) as runtime:
+        with trt.Runtime(self.logger) as runtime:
             self.engine = runtime.deserialize_cuda_engine(engine_bytes)
             self.context = self.engine.create_execution_context()
 
